@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+models/
+mlruns/
+.env
+output/*.csv
+output/*.json
+*.pkl

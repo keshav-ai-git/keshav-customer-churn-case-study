@@ -1,0 +1,10 @@
+Model: logreg\nROC-AUC: 0.5095\n\nConfusion Matrix:\n[[ 58 347]
+ [ 47 348]]\n\nClassification Report:\n              precision    recall  f1-score   support
+
+           0     0.5524    0.1432    0.2275       405
+           1     0.5007    0.8810    0.6385       395
+
+    accuracy                         0.5075       800
+   macro avg     0.5266    0.5121    0.4330       800
+weighted avg     0.5269    0.5075    0.4304       800
+\n

@@ -1,114 +1,133 @@
-# Customer Churn Prediction & AI Service
+Customer Churn Prediction & AI Solution Deployment
 
-An end-to-end **Customer Churn Prediction** project — from data modeling and explainability to deployment via FastAPI for real-time churn risk scoring.  
-Designed as part of a case study to evaluate modeling, experimentation, and deployment skills.
+This repository presents an end-to-end AI solution for predicting telecom customer churn and deploying the model as a real-time inference API using FastAPI.
+It demonstrates the full data science workflow — from model experimentation and explainability to API deployment — aligning with business impact metrics.
 
----
+⸻
 
-## 🎯 Problem Statement
-Telecom companies face high customer turnover, directly affecting revenue and customer lifetime value.  
-The objective of this case study is to build a predictive model that classifies customers likely to churn and deploy it as an AI microservice for real-time scoring.  
+🚀 Problem Statement
 
-📄 Reference: *Case Study Document – Customer Churn Prediction & AI Solution Deployment*  
-📊 Dataset: *customer_churn_dataset.csv*
+Customer churn is one of the most critical KPIs in the telecom industry.
+The objective of this case study is to:
+	•	Predict the likelihood of a customer churning based on their demographic, billing, and service usage data.
+	•	Deploy the best-performing model as a production-ready API for real-time scoring.
+	•	Enable interpretability by identifying top churn drivers and linking them to actionable insights.
 
----
+⸻
 
-## 🧩 Approach & Methodology
+🧩 Approach
 
-### 1. Data Preparation
-- Used the provided preprocessed dataset containing customer demographics, account details, and service usage.  
-- Applied **feature selection, imputation**, and **encoding** using `ColumnTransformer` in `src/pipeline.py`.
+1️⃣ Data Preparation
+	•	Used the provided preprocessed dataset (customer_churn_dataset.csv).
+	•	Verified missing values, encoded categorical variables, and scaled numerical features.
+	•	Split dataset into train/test (80:20) for model validation.
 
-### 2. Modeling
-- Trained multiple models: **Logistic Regression**, **Random Forest**, and **MLPClassifier** (neural network proxy).  
-- Evaluated using **GridSearchCV** with **ROC-AUC** as the main metric.  
-- Selected best model and serialized it as `best_model.pkl`.
+2️⃣ Modeling
+	•	Baseline models: Logistic Regression and Random Forest
+	•	Advanced model: MLPClassifier (Artificial Neural Network)
+	•	Hyperparameter optimization with GridSearchCV
+	•	Model evaluation using ROC-AUC, F1-score, and Confusion Matrix
 
-### 3. Evaluation
-- Metrics tracked: **ROC-AUC**, **F1**, **Precision**, **Recall**, and **Confusion Matrix**.  
-- Feature importance computed using **Permutation Importance** for explainability.  
-- Results stored in `output/metrics.json` and `output/feature_importance.csv`.
+3️⃣ Explainability
+	•	Global feature importance via Permutation Importance
+	•	Identified top churn drivers such as:
+	•	Contract Type
+	•	Tenure
+	•	Monthly Charges
+	•	Internet Service Type
 
-### 4. Deployment
-- Built a **FastAPI** service (`api/main.py`) that:
-  - Loads the trained model (`models/best_model.pkl`)
-  - Serves predictions through REST API endpoints
-  - Allows **live model reload** without restarting the server
-  - Exposes metadata via `/version`
+4️⃣ Deployment
+	•	Built FastAPI microservice (api/main.py) with endpoints:
+	•	POST /predict_churn → Predict churn probability
+	•	GET /health → Check model readiness
+	•	GET /version → View model metadata & metrics
+	•	POST /reload_model → Hot-reload updated model
+	•	Deployed locally with Uvicorn for real-time inference.
 
-### 5. Business Insights
-- Key churn drivers identified:
-  - Contract type (month-to-month most risky)
-  - Short tenure customers
-  - High monthly charges
-  - Fiber optic internet users  
-- Recommendations:
-  - Offer annual contracts or loyalty discounts.
-  - Target high-charge, low-tenure customers for retention.
-  - Bundle additional services to increase stickiness.
+###How to Run
 
----
-
-## ⚙️ How to Run
-
-### 1.Environment Setup
-```bash
+🔧 Setup Environment
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-### 2.Train the Model
+###Train & Generate Artifacts
 python src/train.py --data data/customer_churn_dataset.csv --target Churn --outdir output
 
-Artifacts generated:
-	•	models/best_model.pkl – saved model
-	•	output/metrics.json – model metrics
-	•	output/predictions.csv – predictions
-	•	output/feature_importance.csv – feature importance
-###3.Run the FastAPI Service
+
+Artifacts created:
+	•	models/best_model.pkl – Serialized best model
+	•	output/metrics.json – ROC-AUC, F1, and parameters
+	•	output/feature_importance.csv – Top churn drivers
+	•	output/predictions.csv – Test set predictions
+###Start API Server
 uvicorn api.main:app --reload
 
-###4.Test Endpoints
--Check API status:
-curl http://127.0.0.1:8000/health
--Make a prediction:
-curl -X POST "http://127.0.0.1:8000/predict_churn" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customerID":"0001-XYZ",
-    "gender":"Female","SeniorCitizen":0,"Partner":"Yes","Dependents":"No","tenure":2,
-    "PhoneService":"Yes","MultipleLines":"No","InternetService":"Fiber optic",
-    "OnlineSecurity":"No","OnlineBackup":"No","DeviceProtection":"No","TechSupport":"No",
-    "StreamingTV":"Yes","StreamingMovies":"Yes","Contract":"Month-to-month",
-    "PaperlessBilling":"Yes","PaymentMethod":"Electronic check",
-    "MonthlyCharges":75.9,"TotalCharges":151.65
-  }'
+Open in browser:
+👉 http://127.0.0.1:8000/docs (Swagger UI)
+
+###Example API Usage
+
+Sample Request
+{
+  "customerID": "0001-XYZ",
+  "gender": "Female",
+  "SeniorCitizen": 0,
+  "Partner": "Yes",
+  "Dependents": "No",
+  "tenure": 2,
+  "PhoneService": "Yes",
+  "MultipleLines": "No",
+  "InternetService": "Fiber optic",
+  "OnlineSecurity": "No",
+  "OnlineBackup": "No",
+  "DeviceProtection": "No",
+  "TechSupport": "No",
+  "StreamingTV": "Yes",
+  "StreamingMovies": "Yes",
+  "Contract": "Month-to-month",
+  "PaperlessBilling": "Yes",
+  "PaymentMethod": "Electronic check",
+  "MonthlyCharges": 75.9,
+  "TotalCharges": 151.65
+}
+
+###Sample Response
+
+{
+  "churn_probability": 0.4495,
+  "recommendation": "no_action"
+}
+### Results & Insights
+
+Metric. Logistic Regression. Random Forest. MLP
+ROC-AUC 0.51 0.56 0.60
+F1-Score 0.63 0.66 0.70
 
 
-Method. Endpoint  Description
-GET /health Returns API status and model load state
-GET /version Displays current model version, timestamp, and performance metrics
-POST /predict_churn?threshold=0.45 Returns churn probability; adjustable threshold
-POST /reload_model Reloads latest model after retraining without restarting the API
+Key churn drivers (Permutation Importance):
+	•	Contract type (month-to-month customers churn most)
+	•	Tenure (shorter tenure = higher churn risk)
+	•	InternetService = Fiber optic
+	•	High monthly charges
 
--Example with custom threshold:
-curl -X POST "http://127.0.0.1:8000/predict_churn?threshold=0.40" \
-  -H "Content-Type: application/json" \
-  -d @api/sample_event.json
+Business Recommendations:
+	•	Encourage annual/long-term contracts
+	•	Offer loyalty rewards to new customers
+	•	Promote bundled plans for Fiber customers
+	•	Run personalized retention campaigns for high-charge customers
+### Repository Structure
 
--Repository Structure
 keshav-customer-churn-case-study/
-│
 ├── api/
-│   ├── main.py                # FastAPI application
-│   ├── sample_event.json      # Example API input
+│   ├── main.py
+│   ├── sample_event.json
 │
 ├── data/
 │   └── customer_churn_dataset.csv
 │
 ├── models/
-│   └── best_model.pkl         # Trained model
+│   └── best_model.pkl
 │
 ├── output/
 │   ├── metrics.json
@@ -116,9 +135,29 @@ keshav-customer-churn-case-study/
 │   └── predictions.csv
 │
 ├── src/
-│   ├── pipeline.py            # Preprocessing & feature handling
-│   ├── train.py               # Model training & evaluation
+│   ├── pipeline.py
+│   ├── train.py
 │   └── utils.py
 │
-├── requirements.txt
+├── docs/
+│   └── Churn Prediction API - Swagger UI.pdf
+│
 └── README.md
+
+
+### Assumptions
+	•	Dataset is pre-cleaned and balanced.
+	•	Churn is binary: Yes (1) / No (0).
+	•	Cost asymmetry: false negatives (missed churners) weigh higher than false positives.
+	•	The model is optimized for retention-driven business outcomes, not just accuracy.
+
+⸻
+
+🏁 Conclusion
+
+This project demonstrates a complete AI-driven churn prediction system with strong focus on:
+	•	End-to-end reproducibility
+	•	Explainable insights
+	•	Business actionability
+	•	Real-time deployment readiness
+
